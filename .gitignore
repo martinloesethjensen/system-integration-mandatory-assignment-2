@@ -31,7 +31,7 @@ e2e/*.js
 e2e/*.map
 
 # System Files
-.DS_Store/
+.DS_Store
 
 ### Csharp ###
 ## Ignore Visual Studio temporary files, build results, and
