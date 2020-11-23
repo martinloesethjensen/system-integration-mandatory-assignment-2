@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +55,7 @@ namespace BankSystem.Controllers
             {
                 double interestRateFuncResponse = 0;
                 HttpResponseMessage response = await HTTP.PostRequest("url", new { amount = bodyPayload.Amount }, CancellationToken.None ); // url is to be replaced
-                if (response != null) interestRateFuncResponse = Convert.ToDouble(response.Content.ReadAsStringAsync());
+                if (response != null && response.StatusCode == HttpStatusCode.OK) interestRateFuncResponse = Convert.ToDouble(response.Content.ReadAsStringAsync());
                 if (interestRateFuncResponse == 0) return NotFound("Interest rate function may be offline. Try again later.");
                 DepositDto depositToInsert = new DepositDto(bodyPayload.BankUserId, TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds(), bodyPayload.Amount);
 
