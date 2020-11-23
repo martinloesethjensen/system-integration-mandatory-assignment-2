@@ -22,8 +22,8 @@ namespace BankSystem.Controllers
         }
 
         // GET: api/<DepositController>
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ListDeposits(int id)
+        [HttpGet("{bankUserId}")]
+        public async Task<IActionResult> ListDeposits(int bankUserId)
         {
             /*
             * GETrequest that takes a BankUserId
@@ -32,7 +32,7 @@ namespace BankSystem.Controllers
 
             using (var connection = _databaseContext.Connection)
             {
-                var data = await connection.QueryAsync("select * from Depost where BankUserId = BankUserId@", new { BankUserId = id});
+                var data = await connection.QueryAsync("select * from Deposit where BankUserId = @BankUserId", new { BankUserId = bankUserId });
                 if (data == null) return NotFound();
                 return Ok(data);
             }
