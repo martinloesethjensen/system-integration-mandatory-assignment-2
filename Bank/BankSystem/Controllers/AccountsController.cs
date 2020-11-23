@@ -51,8 +51,6 @@ namespace BankSystem.Controllers
             bodyPayload.CreatedAt = timeStamp;
             bodyPayload.ModifiedAt = timeStamp;
 
-            // Check if user alredy exist
-
             using (var connection = _databaseContext.Connection)
             {
                 var result = await connection.ExecuteAsync("insert into Account (BankUserId,AccountNo,IsStudent,CreatedAt,ModifiedAt,Amount)" +
