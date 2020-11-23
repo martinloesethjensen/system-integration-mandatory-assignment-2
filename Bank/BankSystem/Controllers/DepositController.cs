@@ -22,15 +22,20 @@ namespace BankSystem.Controllers
         }
 
         // GET: api/<DepositController>
-        [HttpGet]
-        public async Task<IActionResult> ListDeposits()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ListDeposits(int id)
         {
             /*
             * GETrequest that takes a BankUserId
             * Returns a list of all the deposits that were made by that user
             */
 
-            return Ok();
+            using (var connection = _databaseContext.Connection)
+            {
+                var data = await connection.QueryAsync("select * from Depost where BankUserId = BankUserId@", new { BankUserId = id});
+                if (data == null) return NotFound();
+                return Ok(data);
+            }
         }
 
         // POST api/<DepositController>
