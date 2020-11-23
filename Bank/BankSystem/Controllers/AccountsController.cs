@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
 using BankSystem.Interfaces;
+using BankSystem.Models;
+using BankSystem.Utils;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankSystem.Controllers
@@ -14,36 +17,78 @@ namespace BankSystem.Controllers
         {
             _databaseContext = databaseContext;
         }
+
         // GET: api/<AccountsController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> RetrieveAllAccounts()
         {
-            return new string[] { "value1", "value2" };
+            using (var connection = _databaseContext.Connection)
+            {
+                var data = await connection.QueryAsync<AccountDto>("select * from Account");
+                if (data == null) return NotFound();
+                return Ok(data);
+            }
         }
 
         // GET api/<AccountsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> RetrieveAccountById(int id)
         {
-            return "value";
+            using (var connection = _databaseContext.Connection)
+            {
+                var data = await connection.QueryFirstOrDefaultAsync<AccountDto>("select * from Account where Id = @Id ", new { Id = id });
+                if (data == null) return NotFound(); 
+                return Ok(data);
+            }
         }
 
         // POST api/<AccountsController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> CreateAccount([FromBody] AccountDto bodyPayload)
         {
+            long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
+
+            bodyPayload.CreatedAt = timeStamp;
+            bodyPayload.ModifiedAt = timeStamp;
+
+            // Check if user alredy exist
+
+            using (var connection = _databaseContext.Connection)
+            {
+                var result = await connection.ExecuteAsync("insert into Account (BankUserId,AccountNo,IsStudent,CreatedAt,ModifiedAt,Amount)" +
+                                                           "values (@BankUserId,@AccountNo,@IsStudent,@CreatedAt,@ModifiedAt,@Amount)", bodyPayload);
+                if (result != 1) return NotFound(); 
+                return Ok();
+            }
         }
 
         // PUT api/<AccountsController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut()]
+        public async Task<IActionResult> UpdateAccount([FromBody] AccountDto bodyPayload)
         {
+            long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
+            bodyPayload.ModifiedAt = timeStamp;
+
+            using (var connection = _databaseContext.Connection)
+            {
+                var result = await connection.ExecuteAsync("update Account set BankUserId = @BankUserId, AccountNo = @AccountNo, " +
+                                                            "IsStudent = @IsStudent, Amount = @Amount, ModifiedAt = @ModifiedAt", bodyPayload);
+
+                if (result != 1) return NotFound();
+                return Ok();
+            }
         }
 
         // DELETE api/<AccountsController>/5
         [HttpDelete("{id}")]
-        public Delete(int id)
+        public async Task<IActionResult> DeleteAccount(int id)
         {
+            using (var connection = _databaseContext.Connection)
+            {
+                var result = await connection.ExecuteAsync("delete from Account where Id = @Id", new { Id = id });
+                if (result == 1) return Ok();
+                else return NotFound();
+            }
         }
     }
 }
