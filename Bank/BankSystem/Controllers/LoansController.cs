@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -77,18 +76,52 @@ namespace BankSystem.Controllers
 
         }
 
-
         // POST api/<LoansController>
         [HttpPost("pay-loan")]
-        public async Task<IActionResult> PayLoad([FromBody] string value)
+        public async Task<IActionResult> PayLoan([FromBody] LoanRequest bodyInput)
         {
             /*
-             * The loan can be paid integrally by using the /pay-loan endpoint. 
-             * The request will contain the BankUserId and the LoanId as well.
-             * This will make the amountfrom a loan 0 and will subtract that amount from the accountof that user. 
-             * If there aren’t enough money on the account, an error will be returned.
+             * The loan can be paid integrally by using the /pay-loan endpoint. (/)
+             * The request will contain the BankUserId and the LoanId as well. (/)
+             * This will make the amount from a loan 0 and will subtract that amount from the accountof that user. (/) 
+             * If there aren’t enough money on the account, an error will be returned. (/)
              */
-            return Ok();
+          
+            using (var connection = _databaseContext.Connection)
+            {
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        var data = new 
+                        {
+                            BankUserId = bodyInput.BankUserId,
+                            LoanId = bodyInput.LoanId,
+                        };
+
+                        var IsAmountOnAccountEnoguh = await connection.QueryFirstOrDefaultAsync("select Amount from Account where BankUserId = @BankUserId AND Amount > @Amount");
+
+                        if (IsAmountOnAccountEnoguh == null) return NotFound("Account balance is low, therefore loan cannot be paid.");
+
+                        var amountToSubstractFromAccount = await connection.QueryFirstOrDefaultAsync("select Amount from Loan where BankUserId = @BankUserId AND Id = @LoanId", data);
+                        var setLoanToZeroResult = await connection.ExecuteAsync("update Loan set Amount = 0 where BankUserId = @BankUserId AND Id = @LoanId", data);
+                        var substractAccountAmountResult = await connection.ExecuteAsync("update Account set Amount = Amount - @Amount, ModifiedAt = @ModifiedAt" +
+                            "where BankUserId = @BankUserId", new { Amount = amountToSubstractFromAccount, ModifiedAt = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds(), BankUserId = bodyInput.BankUserId });
+
+                        if (substractAccountAmountResult != 1 || setLoanToZeroResult != 1) new Exception(); // Change to custom exception
+
+                        transaction.Commit();
+                        return Ok("Loan paid.");
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        return NotFound("Pay loan was not sucessful.");
+                    }
+                        
+                }
+            }
+       
         }
 
         [HttpGet("list-loans/{userId}")]
@@ -106,7 +139,5 @@ namespace BankSystem.Controllers
                 return Ok(data);
             }
         }
-
-
     }
 }
