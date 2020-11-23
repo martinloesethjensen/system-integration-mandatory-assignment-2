@@ -26,8 +26,8 @@ namespace BankSystem.Controllers
         public async Task<IActionResult> ListDeposits(int bankUserId)
         {
             /*
-            * GETrequest that takes a BankUserId
-            * Returns a list of all the deposits that were made by that user
+            * GETrequest that takes a BankUserId (/)
+            * Returns a list of all the deposits that were made by that user (/)
             */
 
             using (var connection = _databaseContext.Connection)
