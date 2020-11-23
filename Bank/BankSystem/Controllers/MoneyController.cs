@@ -35,24 +35,24 @@ namespace BankSystem.Controllers
                 {
                     try
                     {
-                        var bankUserId = await connection.QueryFirstOrDefaultAsync("select UserId from BankUser where Id = @Id", new { Id = bodyPayload.UserId });
+                        var result = await connection.QueryFirstOrDefaultAsync("select UserId from BankUser where Id = @Id", new { Id = bodyPayload.UserId }, transaction);
                         var withdrawMoneyresult = await connection.ExecuteAsync
                         (
                             @"
-                            DECLARE @amount BIGINT
+                            DECLARE @amount INT
                             SELECT 
                                 @amount = Amount
                             FROM	
                                 Account WHERE BankUserId = @BankUserId 
-                            IF @amount > 0
+                            IF @amount > 0  and @amount > @substract
                             UPDATE 
-                                Account SET Amount = 8000 WHERE BankUserId = @BankUserId", new { BankUserId = bankUserId }
+                                Account SET Amount = @amount - @substract WHERE BankUserId = @BankUserId", new { BankUserId = result.UserId, substract = bodyPayload.Amount } , transaction
                         );
                         if (withdrawMoneyresult != 1) new Exception(); // Change to custom exception
                         transaction.Commit();
                         return Ok();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
                         return NotFound("Withdrawal failed.");
