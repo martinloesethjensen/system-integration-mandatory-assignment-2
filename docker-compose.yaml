@@ -23,9 +23,14 @@ services:
     container_name: LoanAlgorythmAzureFunction
     build: Functions/Loan_Algorythm_Function
     ports: 
-      - "8083:80"   
+      - "8083:80"
+  skat_tax_calculator:
+    container_name: SkatTaxCalculator
+    build: Functions/Skat_Tax_Calculator
+    ports:
+      - "8084:80"  
   skat_system:
     container_name: SkatService
     build: skat_service
     ports:
-      - "8084:80"   
+      - "8085:80"   
