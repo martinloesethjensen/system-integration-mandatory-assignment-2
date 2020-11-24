@@ -32,10 +32,6 @@ namespace BankSystem.Controllers
              * If the status code is 200, a loan record will be created (/)
              * If the status code is 403 or similar, an error will be returned (/)
              * The amount will be added to the Account of that user –if it is successfulof course. (/)
-             * 
-             * TODO
-             * Check arount the post req => call stuck
-             * smth is off with the totalAmount
              */
 
             if (bodyPayload.LoanAmount <= 0) return Conflict("LoanAmount cannot be 0 or negative");
@@ -46,22 +42,22 @@ namespace BankSystem.Controllers
                 {
                     try
                     {
-                        var totalAmount = connection.QueryFirstOrDefaultAsync("select SUM(Amount) from Loan where BankUserId = @BankUserId", new { BakUserId = bodyPayload.BankUserId} , transaction );
-                        if (totalAmount == null) return Conflict("Account could not be fetched");
-                        var response = await HTTP.PostRequest("http://localhost:7072/api/Loan_Algorythm_Function", new { loanAmount = bodyPayload.LoanAmount, accountAmount = totalAmount }, CancellationToken.None); // URL is to be filled
+                        var totalLoanResult = await connection.QueryFirstOrDefaultAsync("select SUM(Amount) as Total from Loan where BankUserId = @BankUserId", new { BankUserId = bodyPayload.BankUserId} , transaction );
+                        if (totalLoanResult == null) return Conflict("Account could not be fetched");
+                        var response = await HTTP.PostRequest("http://localhost:7072/api/Loan_Algorythm_Function", new { loanAmount = bodyPayload.LoanAmount, accountAmount = totalLoanResult.Total }, CancellationToken.None); // URL is to be filled
 
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
                             long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
                             LoanDto loanDto = new LoanDto(bodyPayload.BankUserId, timeStamp, timeStamp, bodyPayload.LoanAmount);
                             var loanResult = await connection.ExecuteAsync("insert into Loan(BankUserId,CreatedAt,ModifiedAt,Amount)" +
-                                                                        "values (@BankUserId,@CreatedAt,@ModifiedAt,@Amount)", timeStamp, transaction);
+                                                                        "values (@BankUserId,@CreatedAt,@ModifiedAt,@Amount)", loanDto, transaction);
  
                             AccountDto accountDto = new AccountDto();
                             accountDto.Amount = bodyPayload.LoanAmount;
                             accountDto.ModifiedAt = timeStamp;
                             accountDto.BankUserId = bodyPayload.BankUserId;
-                            var accountResult = await connection.ExecuteAsync("update Account set Amount = @Amount, ModifiedAt = @ModifiedAt where BankUserId = @BankUserId", bodyPayload, transaction );
+                            var accountResult = await connection.ExecuteAsync("update Account set Amount = @Amount, ModifiedAt = @ModifiedAt where BankUserId = @BankUserId", accountDto, transaction );
 
                             if (loanResult != 1 && accountResult != 1) new Exception(); // Need be replaced with custom exception.
                         }
@@ -70,7 +66,7 @@ namespace BankSystem.Controllers
                         transaction.Commit();
                         return Ok();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
                         return NotFound("Loan could not be created");
@@ -89,10 +85,6 @@ namespace BankSystem.Controllers
              * The request will contain the BankUserId and the LoanId as well. (/)
              * This will make the amount from a loan 0 and will subtract that amount from the accountof that user. (/) 
              * If there aren’t enough money on the account, an error will be returned. (/)
-             * 
-             * 
-             * TODO
-             * Check sql steps logically..
              */
           
             using (var connection = _databaseContext.Connection)

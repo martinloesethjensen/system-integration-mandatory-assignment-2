@@ -11,6 +11,8 @@ namespace BankSystem.Utils
     {
         public static async Task<HttpResponseMessage> PostRequest(string url, object content, CancellationToken cancellationToken)
         {
+            HttpResponseMessage returnResponse = null;
+
             using (var client = new HttpClient())
             using (var request = new HttpRequestMessage(HttpMethod.Post, url))
             {
@@ -24,8 +26,8 @@ namespace BankSystem.Utils
                         .ConfigureAwait(true))
                     {
                         response.EnsureSuccessStatusCode();
-                        if (response.StatusCode == HttpStatusCode.OK) return response;
-                        return null;
+                        if (response.StatusCode == HttpStatusCode.OK) returnResponse = response;
+                        return returnResponse;
                     }
                 }
             }
