@@ -54,23 +54,27 @@ namespace BankSystem.Controllers
             try
             {
                 double interestRateFuncResponse = 0;
-                HttpResponseMessage response = await HTTP.PostRequest("url", new { amount = bodyPayload.Amount }, CancellationToken.None ); // url is to be replaced
-                if (response != null && response.StatusCode == HttpStatusCode.OK) interestRateFuncResponse = Convert.ToDouble(response.Content.ReadAsStringAsync());
+                HttpResponseMessage intrestFunctResp = await HTTP.PostRequest("http://localhost:7071/api/Interest_rate_function", new { amount = bodyPayload.Amount }, CancellationToken.None ); // url is to be replaced
+                if (intrestFunctResp != null && intrestFunctResp.StatusCode == HttpStatusCode.OK)
+                {
+                    var temp = await intrestFunctResp.Content.ReadAsStringAsync();
+                    interestRateFuncResponse = Convert.ToDouble(temp.Replace(".", ","));
+                } 
                 if (interestRateFuncResponse == 0) return NotFound("Interest rate function may be offline. Try again later.");
                 DepositDto depositToInsert = new DepositDto(bodyPayload.BankUserId, TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds(), bodyPayload.Amount);
 
                 using (var connection = _databaseContext.Connection)
                 {
-                    var result = await connection.ExecuteAsync("inser into Deposit (BankUserId,CreatedAt,Amount)" +
+                    var result = await connection.ExecuteAsync("insert into Deposit (BankUserId,CreatedAt,Amount)" +
                                                                "values (@BankUserId,@CreatedAt,@Amount)", depositToInsert);
                     if (result != 1) NotFound("Deposit could not be added.");
                 }
 
                 return Ok("Deposit added.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound();
+                return NotFound(ex);
             }
         }
     }

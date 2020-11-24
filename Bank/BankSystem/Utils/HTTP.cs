@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -11,8 +12,6 @@ namespace BankSystem.Utils
     {
         public static async Task<HttpResponseMessage> PostRequest(string url, object content, CancellationToken cancellationToken)
         {
-            HttpResponseMessage returnResponse = null;
-
             using (var client = new HttpClient())
             using (var request = new HttpRequestMessage(HttpMethod.Post, url))
             {
@@ -21,14 +20,14 @@ namespace BankSystem.Utils
                 {
                     request.Content = stringContent;
 
-                    using (var response = await client
+                    var response = await client
                         .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-                        .ConfigureAwait(true))
-                    {
-                        response.EnsureSuccessStatusCode();
-                        if (response.StatusCode == HttpStatusCode.OK) returnResponse = response;
-                        return returnResponse;
-                    }
+                        .ConfigureAwait(true);
+                    
+                    response.EnsureSuccessStatusCode();
+                    Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                    if (response.StatusCode == HttpStatusCode.OK) return response;
+                    return null;
                 }
             }
         }
