@@ -61,7 +61,7 @@ adresses_schema = AddressSchema(many=True)
 
 
 # Create borger
-@app.route('/api/borger', methods=['POST'])
+@app.route('/api/borger/borger', methods=['POST'])
 def add_borger():
     userId = request.json['userId']
 
@@ -74,7 +74,7 @@ def add_borger():
 
 
 # Get all borgers
-@app.route('/api/borger', methods=['GET'])
+@app.route('/api/borger/borger', methods=['GET'])
 def get_all_borger():
     all_borgers = Borger.query.all()
     result = borgers_schema.dump(all_borgers)
@@ -82,14 +82,14 @@ def get_all_borger():
 
 
 # Get single borger
-@app.route('/api/borger/<id>', methods=['GET'])
+@app.route('/api/borger/borger/<id>', methods=['GET'])
 def get_single_borger(id):
     borger = Borger.query.get(id)
     return borger_schema.jsonify(borger)
 
 
 # Update borger
-@app.route('/api/borger/<id>', methods=['PUT'])
+@app.route('/api/borger/borger/<id>', methods=['PUT'])
 def update_borger(id):
     borger = Borger.query.get(id)
 
@@ -102,6 +102,71 @@ def update_borger(id):
     db.session.commit()
 
     return borger_schema.jsonify(borger)
+
+
+# Delete single borger
+@app.route('/api/borger/borger/<id>', methods=['DELETE'])
+def delete_single_borger(id):
+    borger = Borger.query.get(id)
+    db.session.delete(borger)
+    db.session.commit()
+
+    return borger_schema.jsonify(borger)
+
+
+# Create address
+@app.route('/api/borger/address', methods=['POST'])
+def add_borger():
+    userId = request.json['userId']
+
+    new_borger = Borger(userId)
+
+    db.session.add(new_borger)
+    db.session.commit()
+
+    return borger_schema.jsonify(new_borger)
+
+
+# Get all addresses
+@app.route('/api/borger/address', methods=['GET'])
+def get_all_addresses():
+    all_addresses = Address.query.all()
+    result = borgers_schema.dump(all_addresses)
+    return jsonify(result)
+
+
+# Get single address
+@app.route('/api/borger/address/<id>', methods=['GET'])
+def get_single_address(id):
+    address = Address.query.get(id)
+    return address_schema.jsonify(address)
+
+
+# Update address
+@app.route('/api/borger/address/<id>', methods=['PUT'])
+def update_address(id):
+    address = Address.query.get(id)
+
+    userId = request.json['userId']
+    createdAt = request.json['createdAt']
+
+    address.userId = userId
+    address.createdAt = createdAt
+
+    db.session.commit()
+
+    return address_schema.jsonify(address)
+
+
+# Delete single address
+@app.route('/api/borger/address/<id>', methods=['DELETE'])
+def delete_single_address(id):
+    address = Address.query.get(id)
+    db.session.delete(address)
+    db.session.commit()
+
+    return address_schema.jsonify(address)
+
 
 
 if __name__ == '__main__':
