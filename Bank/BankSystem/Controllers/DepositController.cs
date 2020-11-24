@@ -54,7 +54,7 @@ namespace BankSystem.Controllers
             try
             {
                 double interestRateFuncResponse = 0;
-                HttpResponseMessage intrestFunctResp = await HTTP.PostRequest("http://localhost:7071/api/Interest_rate_function", new { amount = bodyPayload.Amount }, CancellationToken.None ); // url is to be replaced
+                HttpResponseMessage intrestFunctResp = await HTTP.PostRequest("http://interest_rate_func/api/Interest_rate_function", new { amount = bodyPayload.Amount }, CancellationToken.None ); // url is to be replaced
                 if (intrestFunctResp != null && intrestFunctResp.StatusCode == HttpStatusCode.OK)
                 {
                     var temp = await intrestFunctResp.Content.ReadAsStringAsync();

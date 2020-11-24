@@ -16,7 +16,7 @@ namespace LoanAlgorythm.Function
     {
         [FunctionName("Loan_Algorythm_Function")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
         {
             try
             {
@@ -24,7 +24,7 @@ namespace LoanAlgorythm.Function
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
                 double amount = data.loanAmount;
                 double totalAmount = data.accountAmount;
-                if (amount > totalAmount * 0.75) return new ForbidResult();
+                if (amount > totalAmount * 0.75) return new NotFoundResult(); //return new ForbidResult();
                 return new OkObjectResult("success");
             }
             catch (Exception)

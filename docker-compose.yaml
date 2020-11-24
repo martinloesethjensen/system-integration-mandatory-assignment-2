@@ -1,10 +1,12 @@
 version: "3.8"
 services:
   bank_system:
+    container_name: BankAPI
     build: Bank
     ports:
       - "8080:80"
   bank_db_mssql:
+    container_name: BankDB
     build: Bank/BankDb
     ports:
       - "1433:1433" 
@@ -12,3 +14,13 @@ services:
         - ACCEPT_EULA=Y  
         - SA_PASSWORD=Password1!  
         - MSSQL_PID=Express
+  interest_rate_func:
+    container_name: InterestRateAzureFunction
+    build: Functions/Interest_rate_function
+    ports: 
+      - "8082:80"
+  loan_algorythm_func:
+    container_name: LoanAlgorythmAzureFunction
+    build: Functions/Loan_Algorythm_Function
+    ports: 
+      - "8083:80"      
