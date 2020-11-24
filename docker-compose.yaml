@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  bank_system:
+    build: Bank
+    ports:
+      - "8080:80"
+  bank_db_mssql:
+    build: Bank/BankDb
+    ports:
+      - "1433:1433" 
+    environment: 
+        - ACCEPT_EULA=Y  
+        - SA_PASSWORD=Password1!  
+        - MSSQL_PID=Express
