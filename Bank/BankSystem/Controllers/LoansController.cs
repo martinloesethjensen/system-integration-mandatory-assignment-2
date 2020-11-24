@@ -44,7 +44,7 @@ namespace BankSystem.Controllers
                     {
                         var totalLoanResult = await connection.QueryFirstOrDefaultAsync("select SUM(Amount) as Total from Loan where BankUserId = @BankUserId", new { BankUserId = bodyPayload.BankUserId} , transaction );
                         if (totalLoanResult == null) return Conflict("Account could not be fetched");
-                        var response = await HTTP.PostRequest("http://localhost:7072/api/Loan_Algorythm_Function", new { loanAmount = bodyPayload.LoanAmount, accountAmount = totalLoanResult.Total }, CancellationToken.None); // URL is to be filled
+                        var response = await HTTP.PostRequest("http://loan_algorythm_func/api/Loan_Algorythm_Function", new { loanAmount = bodyPayload.LoanAmount, accountAmount = totalLoanResult.Total }, CancellationToken.None); // URL is to be filled
 
                         if (response.StatusCode == HttpStatusCode.OK)
                         {

@@ -14,7 +14,7 @@ namespace Interest.rate
     {
         [FunctionName("Interest_rate_function")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
         {
             try
             {
