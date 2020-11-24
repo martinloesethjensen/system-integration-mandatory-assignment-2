@@ -70,8 +70,8 @@ CREATE TABLE [dbo].[Loan] (
     [Amount]     FLOAT (53) NOT NULL
 );
 
-
-
+insert into BankUser (UserId, CreatedAt, ModifiedAt) values (1, 1111111111, 1111111111)
+insert into Account (BankUserId,AccountNo,IsStudent,CreatedAt,ModifiedAt,Amount) values (1,1,0,1111111111,1111111111,100000)
 
 
 
