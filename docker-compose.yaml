@@ -1,5 +1,11 @@
 version: "3.8"
 services:
+  gateway:
+    container_name: gateway
+    build: Gateway
+    ports: 
+      - "5000:80"
+      - "5001:443"
   bank_system:
     container_name: BankAPI
     build: Bank
