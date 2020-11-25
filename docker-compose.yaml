@@ -39,12 +39,9 @@ services:
     container_name: SkatTaxCalculator
     build: Functions/Skat_Tax_Calculator_Function
     ports:
-      - "8085:80"  
-  skat_system:
-    container_name: SkatService
+      - "8085:80"
+  skat_api:
+    container_name: SkatAPI
     build: Skat
     ports:
       - "8086:5006"
-    volumes:
-      - './skat_service:/app'
-

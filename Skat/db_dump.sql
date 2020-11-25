@@ -16,8 +16,8 @@ CREATE TABLE skat_users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_active BOOLEAN DEFAULT false NOT NULL
 );
-INSERT INTO skat_users VALUES(7,'12345678','2020-11-24 17:24:44',1);
-INSERT INTO skat_users VALUES(8,'12341234','2020-11-24 17:25:08',1);
+INSERT INTO skat_users VALUES(7,'2','2020-11-24 17:24:44',1);
+INSERT INTO skat_users VALUES(8,'1','2020-11-24 17:25:08',1);
 CREATE TABLE skat_users_years (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     skat_user_id INTEGER REFERENCES skat_users(id) NOT NULL,
@@ -26,8 +26,8 @@ CREATE TABLE skat_users_years (
     is_paid BOOLEAN DEFAULT false NOT NULL,
     amount REAL DEFAULT 0 NOT NULL
 );
-INSERT INTO skat_users_years VALUES(1,7,1,'12345678',1,1500);
-INSERT INTO skat_users_years VALUES(2,8,1,'12341234',0,0);
+INSERT INTO skat_users_years VALUES(1,7,1,'2',1,1500);
+INSERT INTO skat_users_years VALUES(2,8,1,'1',0,0);
 DELETE FROM sqlite_sequence;
 INSERT INTO sqlite_sequence VALUES('skat_users',8);
 INSERT INTO sqlite_sequence VALUES('skat_years',2);
