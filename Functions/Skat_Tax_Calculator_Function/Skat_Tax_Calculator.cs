@@ -22,7 +22,7 @@ namespace SkatTaxCalculator.Function
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
                 double amount = data.amount * 0.1;
-                return new OkObjectResult(amount);
+                return new OkObjectResult(new { tax_money = amount });
             }
             catch
             {
