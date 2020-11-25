@@ -24,7 +24,7 @@ CREATE TABLE skat_users_years (
     skat_year_id INTEGER REFERENCES skat_years(id) NOT NULL,
     user_id VARCHAR(200) NOT NULL,
     is_paid BOOLEAN DEFAULT false NOT NULL,
-    amount INT DEFAULT 0 NOT NULL
+    amount REAL DEFAULT 0 NOT NULL
 );
 INSERT INTO skat_users_years VALUES(1,7,1,'12345678',1,1500);
 INSERT INTO skat_users_years VALUES(2,8,1,'12341234',0,0);

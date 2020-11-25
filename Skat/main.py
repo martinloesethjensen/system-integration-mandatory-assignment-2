@@ -1,11 +1,12 @@
 import json
-from datetime import datetime
+import requests
 
+from datetime import datetime
 from flask import Flask, request, jsonify, Response
 from flask_marshmallow import Schema
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, DateTime, TIMESTAMP, Text
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, DateTime, TIMESTAMP, Text, Float
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///skat.db'
@@ -14,7 +15,7 @@ db = SQLAlchemy(app)
 api = Api(app)
 
 
-class SkatUser(db.Model):
+class SkatUsers(db.Model):
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(String(200), nullable=False,)
     created_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
@@ -25,16 +26,16 @@ class SkatUser(db.Model):
         self
 
     def __repr__(self):
-        return '<SkatUser %s>' % self.user_id
+        return '<SkatUsers %s>' % self.user_id
 
 
-class SkatUserSchema(Schema):
+class SkatUsersSchema(Schema):
     class Meta:
         fields = ("id", "user_id", "created_at", "is_active")
-        model = SkatUser
+        model = SkatUsers
 
 
-class SkatYear(db.Model):
+class SkatYears(db.Model):
     id = Column(Integer, primary_key=True)
     label = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
@@ -48,21 +49,21 @@ class SkatYear(db.Model):
         self.end_date = end_date
 
     def __repr__(self):
-        return '<SkatYear %s>' % self.label
+        return '<SkatYears %s>' % self.label
 
 
-class SkatYearSchema(Schema):
+class SkatYearsSchema(Schema):
     class Meta:
         fields = ("id", "label", "created_at", "modified_at", "start_date", "end_date")
-        model = SkatYear
+        model = SkatYears
 
-class SkatUserYear(db.Model):
+class SkatUsersYears(db.Model):
     id = Column(Integer, primary_key=True)
     skat_user_id = Column(Integer, ForeignKey('skat_users.id'), nullable=False)
     skat_year_id = Column(Integer, ForeignKey('skat_years.id'), nullable=False)
     user_id = Column(String(200), nullable=False,)
     is_paid = Column(Boolean, nullable=False, default=False)
-    amount = Column(Integer, nullable=False, default=0)
+    amount = Column(Float, nullable=False, default=0.0)
 
     def __init__(self, skat_user_id, skat_year_id, user_id, is_paid, amount):
         self.skat_user_id = skat_user_id
@@ -72,23 +73,23 @@ class SkatUserYear(db.Model):
         self.amount = amount
 
     def __repr__(self):
-        return '<SkatUserYear %s>' % self.id
+        return '<SkatUsersYears %s>' % self.id
 
 
-class SkatUserYearSchema(Schema):
+class SkatUsersYearsSchema(Schema):
     class Meta:
         fields = ("id", "skat_user_id", "skat_year_id", "user_id", "is_paid", "amount")
-        model = SkatUserYear
+        model = SkatUsersYears
 
 
-skat_user_schema = SkatUserSchema()
-skat_users_schema = SkatUserSchema(many=True)
+skat_user_schema = SkatUsersSchema()
+skat_users_schema = SkatUsersSchema(many=True)
 
-skat_year_schema = SkatYearSchema()
-skat_years_schema = SkatYearSchema(many=True)
+skat_year_schema = SkatYearsSchema()
+skat_years_schema = SkatYearsSchema(many=True)
 
-skat_user_year_schema = SkatUserYearSchema()
-skat_users_years_schema = SkatUserYearSchema(many=True)
+skat_user_year_schema = SkatUsersYearsSchema()
+skat_users_years_schema = SkatUsersYearsSchema(many=True)
 
 @app.route('/')
 def hello_world():
@@ -96,7 +97,61 @@ def hello_world():
 
 @app.route('/pay-taxes', methods=['POST'])
 def pay_taxes():
-    pass
+    user_id = request.json['UserId']
+    user_amount = request.json['Amount']
+
+    skat_user_year = SkatUsersYears.query.filter_by(user_id=user_id).first()
+
+    print(skat_user_year)
+    if skat_user_year is None:
+        return Response(response=json.dumps(
+            {"message": "Skat User Year does not exist!"}),
+            status=500,
+            mimetype="application/json")
+    
+    if skat_user_year.is_paid == 1:
+        return Response(response=json.dumps(
+            {"message": "Skat user has paid taxes"}),
+            status=200,
+            mimetype="application/json")
+    else:
+        # TODO: change to 'http://skat_tax_calculator/api/Skat_Tax_Calculator' when docker is up and running
+        response = requests.post('http://skat_tax_calculator/api/Skat_Tax_Calculator', 
+            data=json.dumps({'money': user_amount}), 
+            headers={'Content-Type': 'application/json'})
+        
+        if response:
+            json_response = response.json()
+            tax_money = json_response['tax_money']
+            print(tax_money)
+
+            if tax_money < 0:
+                return Response(response=json.dumps(
+                    {"message": "Negative Value"}),
+                    status=500,mimetype="application/json")
+            
+            skat_user_year.amount = tax_money
+            skat_user_year.is_paid = True
+
+            db.session.commit()
+
+            bank_response = requests.post('http://bank_system/api/Money/withdrawl', 
+                data=json.dumps({'money': user_amount}), 
+                headers={'Content-Type': 'application/json'})
+
+            if bank_response:
+                print("success")
+            else:
+                return Response(response=json.dumps(
+                    {"message": "Something went wrong with the request for withdrawing money."}),
+                    status=500, mimetype="application/json")
+
+            return skat_user_year_schema.jsonify(skat_user_year)
+        else:
+            return Response(response=json.dumps(
+                {"message": "Something went wrong with the request to Skat Tax Calculator."}),
+                status=500, mimetype="application/json")
+
 
 if __name__ == '__main__':
     app.run(port=5006, host='0.0.0.0', debug=True)

@@ -42,10 +42,9 @@ services:
       - "8085:80"  
   skat_system:
     container_name: SkatService
-    build: 
-      context: ./skat_service
-      dockerfile: Dockerfile
+    build: Skat
     ports:
       - "8086:5006"
     volumes:
       - './skat_service:/app'
+
