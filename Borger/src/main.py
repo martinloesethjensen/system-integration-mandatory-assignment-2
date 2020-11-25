@@ -1,6 +1,7 @@
 import datetime
+import json
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_marshmallow import Schema
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
@@ -57,7 +58,7 @@ borger_schema = BorgerSchema()
 borgers_schema = BorgerSchema(many=True)
 
 address_schema = AddressSchema()
-adresses_schema = AddressSchema(many=True)
+addresses_schema = AddressSchema(many=True)
 
 
 # Create borger
@@ -116,22 +117,31 @@ def delete_single_borger(id):
 
 # Create address
 @app.route('/api/borger/address', methods=['POST'])
-def add_borger():
-    userId = request.json['userId']
+def add_address():
+    borgerUserId = request.json['borgerUserId']
 
-    new_borger = Borger(userId)
+    if Borger.query.get(borgerUserId) is None:
+        return Response(response=json.dumps(
+            {"message": "Borger does not exist!"}),
+            status=500,
+            mimetype="application/json")
 
-    db.session.add(new_borger)
+    address = request.json['address']
+    isValid = request.json['isValid']
+
+    new_address = Address(borgerUserId, address, isValid)
+
+    db.session.add(new_address)
     db.session.commit()
 
-    return borger_schema.jsonify(new_borger)
+    return borger_schema.jsonify(new_address)
 
 
 # Get all addresses
 @app.route('/api/borger/address', methods=['GET'])
 def get_all_addresses():
     all_addresses = Address.query.all()
-    result = borgers_schema.dump(all_addresses)
+    result = addresses_schema.dump(all_addresses)
     return jsonify(result)
 
 
@@ -147,11 +157,13 @@ def get_single_address(id):
 def update_address(id):
     address = Address.query.get(id)
 
-    userId = request.json['userId']
-    createdAt = request.json['createdAt']
+    borgerUserId = request.json['borgerUserId']
+    addressField = request.json['address']
+    isValid = request.json['isValid']
 
-    address.userId = userId
-    address.createdAt = createdAt
+    address.borgerUserId = borgerUserId
+    address.address = addressField
+    address.isValid = isValid
 
     db.session.commit()
 
@@ -166,7 +178,6 @@ def delete_single_address(id):
     db.session.commit()
 
     return address_schema.jsonify(address)
-
 
 
 if __name__ == '__main__':
