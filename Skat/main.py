@@ -116,7 +116,7 @@ def pay_taxes():
             mimetype="application/json")
     else:
         # TODO: change to 'http://skat_tax_calculator/api/Skat_Tax_Calculator' when docker is up and running
-        response = requests.post('http://localhost:7071/api/Skat_Tax_Calculator', 
+        response = requests.post('http://skat_tax_calculator/api/Skat_Tax_Calculator', 
             data=json.dumps({'money': user_amount}), 
             headers={'Content-Type': 'application/json'})
         
