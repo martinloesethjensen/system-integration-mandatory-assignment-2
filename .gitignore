@@ -34,7 +34,7 @@ e2e/*.map
 .DS_Store
 
 ### Csharp ###
-.vscode
+
 Functions/.vs
 Functions/.vscode
 Functions/Interest_rate_function/bin
