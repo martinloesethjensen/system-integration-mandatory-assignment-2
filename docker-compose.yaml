@@ -39,13 +39,4 @@ services:
     container_name: SkatTaxCalculator
     build: Functions/Skat_Tax_Calculator
     ports:
-      - "8085:80"  
-  skat_system:
-    container_name: SkatService
-    build: 
-      context: ./skat_service
-      dockerfile: Dockerfile
-    ports:
-      - "8086:80"
-    volumes:
-      - './skat_service:/app'
+      - "8085:80"
