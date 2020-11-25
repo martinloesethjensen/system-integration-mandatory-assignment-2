@@ -1,5 +1,11 @@
 version: "3.8"
 services:
+  gateway:
+    container_name: gateway
+    build: Gateway
+    ports: 
+      - "5000:80"
+      - "5001:443"
   bank_system:
     container_name: BankAPI
     build: Bank
@@ -24,17 +30,22 @@ services:
     build: Functions/Loan_Algorythm_Function
     ports: 
       - "8083:80"
+  borger_api:
+    container_name: BorgerAPI
+    build: Borger/src 
+    ports:
+      - "8084:5004"
   skat_tax_calculator:
     container_name: SkatTaxCalculator
     build: Functions/Skat_Tax_Calculator
     ports:
-      - "8084:80"  
+      - "8085:80"  
   skat_system:
     container_name: SkatService
     build: 
       context: ./skat_service
       dockerfile: Dockerfile
     ports:
-      - "8085:80"
+      - "8086:80"
     volumes:
       - './skat_service:/app'

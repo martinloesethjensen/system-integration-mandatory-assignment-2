@@ -1,8 +1,9 @@
--- PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
-DROP TABLE IF EXISTS skat_users;
-DROP TABLE IF EXISTS skat_years;
-DROP TABLE IF EXISTS skat_users_years;
+DROP TABLE IF EXISTS skat_users CASCADE;
+DROP TABLE IF EXISTS skat_years CASCADE;
+DROP TABLE IF EXISTS skat_users_years CASCADE;
+DROP TRIGGER IF EXISTS trigger_skat_year_changed ON skat_years CASCADE;
+DROP FUNCTION IF EXISTS skat_year_changed CASCADE; 
 
 CREATE TABLE skat_years (
     id SERIAL PRIMARY KEY NOT NULL,
@@ -32,16 +33,6 @@ CREATE TABLE skat_users_years (
 );
 INSERT INTO skat_users_years VALUES(1,7,1,'12345678',1::boolean,1500);
 INSERT INTO skat_users_years VALUES(2,8,1,'12341234',0::boolean,0);
--- DELETE FROM sqlite_sequence;
--- INSERT INTO sqlite_sequence VALUES('skat_users',8);
--- INSERT INTO sqlite_sequence VALUES('skat_years',2);
--- INSERT INTO sqlite_sequence VALUES('skat_users_years',4);
--- CREATE TRIGGER UpTIMESTAMPstamps AFTER UPDATE ON skat_years
---   FOR EACH ROW WHEN NEW.modified_at <= OLD.modified_at 
--- BEGIN 
---   UPDATE skat_years SET modified_at=CURRENT_TIMESTAMP WHERE id=OLD.id;  
--- END;
-
 CREATE FUNCTION skat_year_changed() RETURNS TRIGGER
     LANGUAGE plpgsql
     AS $$
@@ -52,10 +43,8 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
 CREATE TRIGGER trigger_skat_year_changed
   BEFORE UPDATE ON skat_years
   FOR EACH ROW
   EXECUTE PROCEDURE skat_year_changed();
-
 COMMIT;

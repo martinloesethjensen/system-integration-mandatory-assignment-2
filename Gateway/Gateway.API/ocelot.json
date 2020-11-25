@@ -1,128 +1,216 @@
-{    
-    "Routes": [    
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{everything}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5004"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/borger/{controller}/{everything}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{identifier}/{everything}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5004"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/borger/{controller}}/{identifier}/{everything}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5004"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/borger/{controller}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{everything}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5005"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/bank/{controller}/{everything}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{identifier}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5005"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/bank/{controller}/{identifier}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{identifier}/{everything}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5005"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/bank/{controller}/{identifier}/{everything}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{everything}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5006"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/skat/{controller}/{everything}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{identifier}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5006"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/skat/{controller}/{identifier}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {    
-        "DownstreamPathTemplate": "/api/{controller}/{identifier}/{everything}",    
-        "DownstreamScheme": "http",
-        "DownstreamHostandPorts": [    
-         {    
-           "Host": "localhost",    
-           "Port": "5006"    
-          }     
-        ],    
-        "UpstreamPathTemplate": "/api/skat/{controller}/{identifier}/{everything}",    
-        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
-      },
-      {
-        "DownstreamPathTemplate": "/todos",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "jsonplaceholder.typicode.com",
-                "Port": 443
-            }
-        ],
-        "UpstreamPathTemplate": "/todos",
-        "UpstreamHttpMethod": [ "GET" ]
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/borger/borger",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
         }
-    ],
-    "GlobalConfiguration": {
-      "RequestIdKey": null,
-      "AdministrationPath": null
-      }
-  }    
+      ],
+      "UpstreamPathTemplate": "/api/borger/borger",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/borger/borger/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/borger{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE",
+        "PUT"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/borger/address",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/address",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/borger/address/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/address/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE",
+        "PUT"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Accounts",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Accounts",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Accounts/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Accounts/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/BankUsers",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/BankUsers",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/BankUsers/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/BankUsers/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Deposit/{bankUserId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/list-deposits/{bankUserId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Deposit",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/add-deposit}",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Loans/create-loan",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/create-loan/",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Loans/pay-loan",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/pay-loan/",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Loans/list-loans/{bankUserId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/list-loans/{bankUserId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Money/withdrawl",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "bank_system",
+          "Port": "80"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/withdrawl",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "RequestIdKey": null,
+    "AdministrationPath": null
+  }
+}
