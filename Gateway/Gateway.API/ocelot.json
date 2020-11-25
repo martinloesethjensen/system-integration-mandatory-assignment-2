@@ -1,6 +1,68 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/borger/borger",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/borger",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/borger/borger/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/borger{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE",
+        "PUT"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/borger/address",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/address",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/borger/address/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "borger_api",
+          "Port": "5004"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/borger/address/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "DELETE",
+        "PUT"
+      ]
+    },
+    {
       "DownstreamPathTemplate": "/api/Accounts",
       "DownstreamScheme": "http",
       "DownstreamHostandPorts": [

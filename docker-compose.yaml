@@ -29,4 +29,9 @@ services:
     container_name: LoanAlgorythmAzureFunction
     build: Functions/Loan_Algorythm_Function
     ports: 
-      - "8083:80"      
+      - "8083:80"
+  borger_api:
+    container_name: BorgerAPI
+    build: Borger/src 
+    ports:
+      - "8084:5004"

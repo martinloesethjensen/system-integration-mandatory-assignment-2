@@ -181,4 +181,4 @@ def delete_single_address(id):
 
 
 if __name__ == '__main__':
-    app.run(port=5004, debug=True)
+    app.run(port=5004, host='0.0.0.0', debug=True)
