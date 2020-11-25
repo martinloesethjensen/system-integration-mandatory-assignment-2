@@ -95,6 +95,27 @@ skat_users_years_schema = SkatUsersYearsSchema(many=True)
 def hello_world():
     return 'Hello, World!'
 
+# Get all skat users
+@app.route('/api/skat-users', methods=['GET'])
+def get_all_skat_users():
+    all_skat_users = SkatUsers.query.all()
+    result = skat_users_schema.dump(all_skat_users)
+    return jsonify(result)
+
+# Get all skat years
+@app.route('/api/skat-years', methods=['GET'])
+def get_all_skat_years():
+    all_skat_years = SkatYears.query.all()
+    result = skat_years_schema.dump(all_skat_years)
+    return jsonify(result)
+
+# Get all skat users years
+@app.route('/api/skat-users-years', methods=['GET'])
+def get_all_skat_users_years():
+    all_skat_users_years = SkatUsersYears.query.all()
+    result = skat_users_years_schema.dump(all_skat_users_years)
+    return jsonify(result)
+
 @app.route('/pay-taxes', methods=['POST'])
 def pay_taxes():
     user_id = request.json['UserId']
@@ -106,14 +127,12 @@ def pay_taxes():
     if skat_user_year is None:
         return Response(response=json.dumps(
             {"message": "Skat User Year does not exist!"}),
-            status=500,
-            mimetype="application/json")
+            status=500, mimetype="application/json")
     
     if skat_user_year.is_paid == 1:
         return Response(response=json.dumps(
             {"message": "Skat user has paid taxes"}),
-            status=200,
-            mimetype="application/json")
+            status=200, mimetype="application/json")
     else:
         response = requests.post('http://skat_tax_calculator/api/Skat_Tax_Calculator', 
             data=json.dumps({'amount': user_amount}), 
@@ -122,12 +141,11 @@ def pay_taxes():
         if response:
             json_response = response.json()
             tax_money = json_response['tax_money']
-            print(tax_money)
 
             if tax_money < 0:
                 return Response(response=json.dumps(
                     {"message": "Negative Value"}),
-                    status=500,mimetype="application/json")
+                    status=500, mimetype="application/json")
             
             skat_user_year.amount = tax_money
             skat_user_year.is_paid = True
@@ -139,7 +157,9 @@ def pay_taxes():
                 headers={'Content-Type': 'application/json'})
 
             if bank_response:
-                print("success")
+                return Response(response=json.dumps(
+                    {"message": "Succeeded in sending request to the bank api"}),
+                    status=200,mimetype="application/json")
             else:
                 return Response(response=json.dumps(
                     {"message": "Something went wrong with the request for withdrawing money."}),
