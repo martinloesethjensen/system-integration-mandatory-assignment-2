@@ -4,3 +4,4 @@ flask-restful
 flask-sqlalchemy
 sqlalchemy
 marshmallow-sqlalchemy
+requests
