@@ -150,17 +150,17 @@ def pay_taxes():
             skat_user_year.amount = tax_money
             skat_user_year.is_paid = True
 
-            db.session.commit()
-
             bank_response = requests.post('http://bank_system/api/Money/withdrawl', 
-                data=json.dumps({'userId': user_id, 'money': user_amount}), 
+                data=json.dumps({'userId': user_id, 'amount': user_amount}), 
                 headers={'Content-Type': 'application/json'})
 
             if bank_response:
+                db.session.commit()
                 return Response(response=json.dumps(
                     {"message": "Succeeded in sending request to the bank api"}),
                     status=200,mimetype="application/json")
             else:
+
                 return Response(response=json.dumps(
                     {"message": "Something went wrong with the request for withdrawing money."}),
                     status=500, mimetype="application/json")
