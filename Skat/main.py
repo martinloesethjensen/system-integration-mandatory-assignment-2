@@ -40,8 +40,8 @@ class SkatYears(db.Model):
     label = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
     modified_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
-    start_date = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
-    end_date = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
+    start_date = Column(Text, nullable=False, default=datetime.now())
+    end_date = Column(Text, nullable=False, default=datetime.now())
 
     def __init__(self, label, start_date, end_date):
         self.label = label
@@ -153,7 +153,7 @@ def pay_taxes():
             db.session.commit()
 
             bank_response = requests.post('http://bank_system/api/Money/withdrawl', 
-                data=json.dumps({'money': user_amount}), 
+                data=json.dumps({'userId': user_id, 'money': user_amount}), 
                 headers={'Content-Type': 'application/json'})
 
             if bank_response:
