@@ -123,7 +123,6 @@ def pay_taxes():
 
     skat_user_year = SkatUsersYears.query.filter_by(user_id=user_id).first()
 
-    print(skat_user_year)
     if skat_user_year is None:
         return Response(response=json.dumps(
             {"message": "Skat User Year does not exist!"}),
