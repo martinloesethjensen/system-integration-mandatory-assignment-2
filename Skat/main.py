@@ -42,11 +42,13 @@ class SkatYears(db.Model):
     modified_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
     start_date = Column(Text, nullable=False, default=datetime.now())
     end_date = Column(Text, nullable=False, default=datetime.now())
+    is_active = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, label, start_date, end_date):
+    def __init__(self, label, start_date, end_date, is_active):
         self.label = label
         self.start_date = start_date
         self.end_date = end_date
+        self.is_active = is_active
 
     def __repr__(self):
         return '<SkatYears %s>' % self.label
@@ -54,7 +56,7 @@ class SkatYears(db.Model):
 
 class SkatYearsSchema(Schema):
     class Meta:
-        fields = ("id", "label", "created_at", "modified_at", "start_date", "end_date")
+        fields = ("id", "label", "created_at", "modified_at", "start_date", "end_date", "is_active")
         model = SkatYears
 
 class SkatUsersYears(db.Model):
@@ -90,10 +92,6 @@ skat_years_schema = SkatYearsSchema(many=True)
 
 skat_user_year_schema = SkatUsersYearsSchema()
 skat_users_years_schema = SkatUsersYearsSchema(many=True)
-
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
 
 # Get all skat users
 @app.route('/api/skat-users', methods=['GET'])
