@@ -1,12 +1,12 @@
 import json
+from datetime import datetime
 import requests
 
-from datetime import datetime
 from flask import Flask, request, jsonify, Response
 from flask_marshmallow import Schema
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, DateTime, TIMESTAMP, Text, Float
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, TIMESTAMP, Text, Float
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///skat.db'
@@ -248,6 +248,20 @@ def update_skat_year(id):
     if is_active is not None:
         skat_year.is_active = is_active
 
+    db.session.commit()
+    return skat_year_schema.jsonify(skat_year)
+
+
+# Delete a skat year
+@app.route('/api/skat/skat-users/<id>', methods=['DELETE'])
+def delete_skat_year(id):
+    skat_year = SkatYears.query.get(id)
+    if skat_year is None:
+        return Response(response=json.dumps(
+            {"message": "Skat User with id {} does not exist!".format(id)}),
+            status=404, mimetype="application/json")
+
+    db.session.delete(skat_year)
     db.session.commit()
     return skat_year_schema.jsonify(skat_year)
 
