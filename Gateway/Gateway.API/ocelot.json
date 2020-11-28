@@ -293,11 +293,11 @@
           "Port": "5006"
         }
       ],
-      "UpstreamPathTemplate": "/api/skat/skat-users/years",
+      "UpstreamPathTemplate": "/api/skat/skat-users-years",
       "UpstreamHttpMethod": [
         "GET"
       ]
-    },
+    }
   ],
   "GlobalConfiguration": {
     "RequestIdKey": null,
