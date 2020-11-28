@@ -19,11 +19,12 @@ class SkatUsers(db.Model):
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(String(200), nullable=False,)
     created_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
-    is_active = Column(Boolean, nullable=False, default=False)
+    is_active = Column(Boolean, nullable=False, default=True)
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, created_at, is_active):
         self.user_id = user_id
-        self
+        self.created_at = created_at
+        self.is_active = is_active
 
     def __repr__(self):
         return '<SkatUsers %s>' % self.user_id
@@ -93,28 +94,103 @@ skat_years_schema = SkatYearsSchema(many=True)
 skat_user_year_schema = SkatUsersYearsSchema()
 skat_users_years_schema = SkatUsersYearsSchema(many=True)
 
+### ----------------
+### Skat Users
+### ----------------
+
 # Get all skat users
-@app.route('/api/skat-users', methods=['GET'])
+@app.route('/api/skat/skat-users', methods=['GET'])
 def get_all_skat_users():
     all_skat_users = SkatUsers.query.all()
     result = skat_users_schema.dump(all_skat_users)
     return jsonify(result)
 
+
+# Get single skat user
+@app.route('/api/skat/skat-users/<id>', methods=['GET'])
+def get_single_skat_user(id):
+    skat_user = SkatUsers.query.get(id)
+    return skat_user_schema.jsonify(skat_user)
+
+
+# Delete a skat user
+@app.route('/api/skat/skat-users/<id>', methods=['DELETE'])
+def delete_skat_user(id):
+    skat_user = SkatUsers.query.get(id)
+    db.session.delete(skat_user)
+    db.session.commit()
+    return skat_user_schema.jsonify(skat_user)
+
+
+# Create skat user
+@app.route('/api/skat/skat-users', methods=['POST'])
+def create_skat_user():
+    user_id = request.json['userId']
+    created_at = request.json['createdAt']
+    is_active = request.json['isActive']
+    new_skat_user = SkatUsers(user_id, created_at, is_active)
+    db.session.add(new_skat_user)
+    db.session.commit()
+    return skat_user_schema.jsonify(new_skat_user)
+
+
+# Update skat user
+@app.route('/api/skat/skat-users/<id>', methods=['PUT'])
+def update_skat_user(id):
+    user_id = request.json['userId']
+    created_at = request.json['createdAt']
+    is_active = request.json['isActive']
+
+    skat_user = SkatUsers.query.get(id)
+
+    if user_id:
+        skat_user.user_id = user_id
+
+    if created_at:
+        skat_user.created_at = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S")
+    
+    if is_active is not None:
+        skat_user.is_active = is_active
+
+    db.session.commit()
+    return skat_user_schema.jsonify(skat_user)
+
+### ----------------
+### Skat Years
+### ----------------
+
 # Get all skat years
-@app.route('/api/skat-years', methods=['GET'])
+@app.route('/api/skat/skat-years', methods=['GET'])
 def get_all_skat_years():
     all_skat_years = SkatYears.query.all()
     result = skat_years_schema.dump(all_skat_years)
     return jsonify(result)
 
+
+# Get single skat year
+@app.route('/api/skat/skat-years/<id>', methods=['GET'])
+def get_single_skat_year(id):
+    skat_year = SkatYears.query.get(id)
+    return skat_year_schema.jsonify(skat_year)
+
+
+### ----------------
+### Skat Users Years
+### ----------------
+
 # Get all skat users years
-@app.route('/api/skat-users-years', methods=['GET'])
+@app.route('/api/skat/skat-users-years', methods=['GET'])
 def get_all_skat_users_years():
     all_skat_users_years = SkatUsersYears.query.all()
     result = skat_users_years_schema.dump(all_skat_users_years)
     return jsonify(result)
 
-@app.route('/pay-taxes', methods=['POST'])
+
+### ----------------
+### Pay Taxes
+### ----------------
+
+@app.route('/api/skat/pay-taxes', methods=['POST'])
 def pay_taxes():
     user_id = request.json['UserId']
     user_amount = request.json['Amount']
@@ -131,18 +207,21 @@ def pay_taxes():
             {"message": "Skat user has paid taxes"}),
             status=200, mimetype="application/json")
     else:
-        response = requests.post('http://skat_tax_calculator/api/Skat_Tax_Calculator', 
+        tax_calc_response = requests.post('http://skat_tax_calculator/api/Skat_Tax_Calculator', 
             data=json.dumps({'amount': user_amount}), 
             headers={'Content-Type': 'application/json'})
         
-        if response:
-            json_response = response.json()
+        # Status code is 200
+        if tax_calc_response:
+            json_response = tax_calc_response.json()
             tax_money = json_response['tax_money']
 
+            # tax_money can't be negative
+            # Return 400 - bad request 'cause of negative number value
             if tax_money < 0:
                 return Response(response=json.dumps(
                     {"message": "Negative Value"}),
-                    status=500, mimetype="application/json")
+                    status=400, mimetype="application/json")
             
             skat_user_year.amount = tax_money
             skat_user_year.is_paid = True
@@ -151,7 +230,9 @@ def pay_taxes():
                 data=json.dumps({'userId': user_id, 'amount': user_amount}), 
                 headers={'Content-Type': 'application/json'})
 
+            # Status code is 200
             if bank_response:
+                # Only commit db changes if bank_response is ok 
                 db.session.commit()
                 return Response(response=json.dumps(
                     {"message": "Succeeded in sending request to the bank api"}),

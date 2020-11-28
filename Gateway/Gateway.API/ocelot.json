@@ -217,7 +217,7 @@
           "Port": "5006"
         }
       ],
-      "UpstreamPathTemplate": "/api/skat/skat-users",
+      "UpstreamPathTemplate": "/api/skat-users",
       "UpstreamHttpMethod": [
         "GET",
         "POST"
@@ -232,7 +232,7 @@
           "Port": "5006"
         }
       ],
-      "UpstreamPathTemplate": "/api/skat/skat-users/{id}",
+      "UpstreamPathTemplate": "/api/skat-users/{id}",
       "UpstreamHttpMethod": [
         "GET",
         "DELETE",
@@ -248,7 +248,7 @@
           "Port": "5006"
         }
       ],
-      "UpstreamPathTemplate": "/api/skat/skat-years",
+      "UpstreamPathTemplate": "/api/skat-years",
       "UpstreamHttpMethod": [
         "GET",
         "POST"
@@ -263,11 +263,25 @@
           "Port": "5006"
         }
       ],
-      "UpstreamPathTemplate": "/api/skat/skat-years/{id}",
+      "UpstreamPathTemplate": "/api/skat-years/{id}",
       "UpstreamHttpMethod": [
         "GET",
         "DELETE",
         "PUT"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/skat/pay-taxes",
+      "DownstreamScheme": "http",
+      "DownstreamHostandPorts": [
+        {
+          "Host": "skat_api",
+          "Port": "5006"
+        }
+      ],
+      "UpstreamPathTemplate": "/api/pay-taxes",
+      "UpstreamHttpMethod": [
+        "POST"
       ]
     }
   ],
