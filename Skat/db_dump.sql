@@ -3,9 +3,10 @@ BEGIN TRANSACTION;
 DROP TABLE IF EXISTS skat_users_years;
 DROP TABLE IF EXISTS skat_users;
 DROP TABLE IF EXISTS skat_years;
-DROP TRIGGER IF EXISTS update_timestamps;
+DROP TRIGGER IF EXISTS update_year_timestamps;
 DROP TRIGGER IF EXISTS create_active_year;
 DROP TRIGGER IF EXISTS update_active_year;
+DROP TRIGGER IF EXISTS create_year;
 CREATE TABLE skat_years (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     label TEXT NOT NULL,
@@ -39,7 +40,7 @@ DELETE FROM sqlite_sequence;
 INSERT INTO sqlite_sequence VALUES('skat_users',8);
 INSERT INTO sqlite_sequence VALUES('skat_years',2);
 INSERT INTO sqlite_sequence VALUES('skat_users_years',4);
-CREATE TRIGGER update_timestamps AFTER UPDATE ON skat_years
+CREATE TRIGGER update_year_timestamps AFTER UPDATE ON skat_years
   FOR EACH ROW WHEN NEW.modified_at <= OLD.modified_at 
 BEGIN 
   UPDATE skat_years SET modified_at=CURRENT_TIMESTAMP WHERE id=OLD.id;  
@@ -48,6 +49,15 @@ CREATE TRIGGER create_active_year AFTER INSERT ON skat_years
   FOR EACH ROW WHEN NEW.is_active IS TRUE
 BEGIN
   UPDATE skat_years SET is_active=FALSE WHERE id IS NOT NEW.id;
+END;
+CREATE TRIGGER create_year BEFORE INSERT ON skat_years
+  FOR EACH ROW
+BEGIN
+  SELECT RAISE(ABORT, 'There can be only one year.')
+    WHERE EXISTS (SELECT 1
+                  FROM skat_years
+                  WHERE start_date = NEW.start_date 
+                  and end_date = NEW.end_date);
 END;
 CREATE TRIGGER update_active_year AFTER UPDATE ON skat_years
   FOR EACH ROW WHEN NEW.is_active IS TRUE

@@ -43,10 +43,12 @@ class SkatYears(db.Model):
     modified_at = Column(TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
     start_date = Column(Text, nullable=False, default=datetime.now())
     end_date = Column(Text, nullable=False, default=datetime.now())
-    is_active = Column(Boolean, nullable=False, default=False)
+    is_active = Column(Boolean, nullable=False, default=True)
 
-    def __init__(self, label, start_date, end_date, is_active):
+    def __init__(self, label, created_at, modified_at, start_date, end_date, is_active):
         self.label = label
+        self.created_at = created_at
+        self.modified_at = modified_at
         self.start_date = start_date
         self.end_date = end_date
         self.is_active = is_active
@@ -110,6 +112,10 @@ def get_all_skat_users():
 @app.route('/api/skat/skat-users/<id>', methods=['GET'])
 def get_single_skat_user(id):
     skat_user = SkatUsers.query.get(id)
+    if skat_user is None:
+        return Response(response=json.dumps(
+            {"message": "Skat User with id {} does not exist!".format(id)}),
+            status=200, mimetype="application/json")
     return skat_user_schema.jsonify(skat_user)
 
 
@@ -171,7 +177,23 @@ def get_all_skat_years():
 @app.route('/api/skat/skat-years/<id>', methods=['GET'])
 def get_single_skat_year(id):
     skat_year = SkatYears.query.get(id)
+    if skat_year is None:
+        return Response(response=json.dumps(
+            {"message": "Skat Year with id {} does not exist!".format(id)}),
+            status=200, mimetype="application/json")
     return skat_year_schema.jsonify(skat_year)
+
+
+# Create skat year
+@app.route('/api/skat/skat-years', methods=['POST'])
+def create_skat_year():
+    user_id = request.json['userId']
+    created_at = request.json['createdAt']
+    is_active = request.json['isActive']
+    new_skat_year = SkatYears(user_id, created_at, is_active)
+    db.session.add(new_skat_user)
+    db.session.commit()
+    return skat_user_schema.jsonify(new_skat_user)
 
 
 ### ----------------
@@ -200,7 +222,7 @@ def pay_taxes():
     if skat_user_year is None:
         return Response(response=json.dumps(
             {"message": "Skat User Year does not exist!"}),
-            status=500, mimetype="application/json")
+            status=200, mimetype="application/json")
     
     if skat_user_year.is_paid == 1:
         return Response(response=json.dumps(
