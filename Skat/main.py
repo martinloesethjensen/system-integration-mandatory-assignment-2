@@ -115,8 +115,8 @@ def get_single_skat_user(id):
     if skat_user is None:
         return Response(response=json.dumps(
             {"message": "Skat User with id {} does not exist!".format(id)}),
-            status=200, mimetype="application/json")
-    return skat_user_schema.jsonify(skat_user)
+            status=404, mimetype="application/json")
+    return skat_user_schema.jsonify(skat_user), 200
 
 
 # Delete a skat user
@@ -133,7 +133,7 @@ def delete_skat_user(id):
 
     db.session.delete(skat_user)
     db.session.commit()
-    return skat_user_schema.jsonify(skat_user)
+    return skat_user_schema.jsonify(skat_user), 200
 
 
 # Create skat user
@@ -145,7 +145,7 @@ def create_skat_user():
     new_skat_user = SkatUsers(user_id, created_at, is_active)
     db.session.add(new_skat_user)
     db.session.commit()
-    return skat_user_schema.jsonify(new_skat_user)
+    return skat_user_schema.jsonify(new_skat_user), 201
 
 
 # Update skat user
@@ -170,7 +170,7 @@ def update_skat_user(id):
         skat_user.is_active = is_active
 
     db.session.commit()
-    return skat_user_schema.jsonify(skat_user)
+    return skat_user_schema.jsonify(skat_user), 200
 
 ### ----------------
 ### Skat Years
@@ -181,7 +181,7 @@ def update_skat_user(id):
 def get_all_skat_years():
     all_skat_years = SkatYears.query.all()
     result = skat_years_schema.dump(all_skat_years)
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 # Get single skat year
@@ -192,7 +192,7 @@ def get_single_skat_year(id):
         return Response(response=json.dumps(
             {"message": "Skat Year with id {} does not exist!".format(id)}),
             status=404, mimetype="application/json")
-    return skat_year_schema.jsonify(skat_year)
+    return skat_year_schema.jsonify(skat_year), 200
 
 
 # Create skat year
@@ -215,7 +215,7 @@ def create_skat_year():
 
     db.session.add(new_skat_year)
     db.session.commit()
-    return skat_year_schema.jsonify(new_skat_year)
+    return skat_year_schema.jsonify(new_skat_year), 201
 
 
 # Update skat year
@@ -249,7 +249,7 @@ def update_skat_year(id):
         skat_year.is_active = is_active
 
     db.session.commit()
-    return skat_year_schema.jsonify(skat_year)
+    return skat_year_schema.jsonify(skat_year), 200
 
 
 # Delete a skat year
@@ -263,7 +263,7 @@ def delete_skat_year(id):
 
     db.session.delete(skat_year)
     db.session.commit()
-    return skat_year_schema.jsonify(skat_year)
+    return skat_year_schema.jsonify(skat_year), 200
 
 
 ### ----------------
@@ -275,7 +275,7 @@ def delete_skat_year(id):
 def get_all_skat_users_years():
     all_skat_users_years = SkatUsersYears.query.all()
     result = skat_users_years_schema.dump(all_skat_users_years)
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 ### ----------------
@@ -289,9 +289,9 @@ def pay_taxes():
 
     skat_user_year = SkatUsersYears.query.filter_by(user_id=user_id).first()
 
-    if skat_user_year is None:
+    if not skat_user_year:
         return Response(response=json.dumps(
-            {"message": "Skat User Year does not exist!"}),
+            {"message": "Skat User Year with user id {} does not exist!".format(user_id)}),
             status=404, mimetype="application/json")
     
     if skat_user_year.is_paid == 1:
