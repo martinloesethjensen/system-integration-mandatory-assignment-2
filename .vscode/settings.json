@@ -5,6 +5,5 @@
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.preDeployTask": "publish",
-    "python.pythonPath": "/Users/mlj/sandbox/system-integration-mandatory-assignment-2/skat-env/bin/python3.9"
+    "azureFunctions.preDeployTask": "publish"
 }
