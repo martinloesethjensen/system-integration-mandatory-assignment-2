@@ -83,7 +83,12 @@ def update_skat_year(id):
     if is_active is not None:
         skat_year.is_active = is_active
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Could not commit update skat year to database.", 500
+
     return src.models.skat_year_schema.jsonify(skat_year), 200
 
 
@@ -96,7 +101,12 @@ def delete_skat_year(id):
             {"message": "Skat Year with id {} does not exist!".format(id)}),
             status=404, mimetype="application/json")
 
-    db.session.delete(skat_year)
-    db.session.commit()
+    try:
+        db.session.delete(skat_year)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Could not delete skat year with id {}".format(id), 500
+    
     return src.models.skat_year_schema.jsonify(skat_year), 200
 
