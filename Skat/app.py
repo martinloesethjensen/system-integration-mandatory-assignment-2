@@ -7,91 +7,20 @@ from flask_marshmallow import Schema
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, TIMESTAMP, Text, Float
 
-from models import *
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///skat.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# ----------------
-# Skat Users
-# ----------------
+from src.models import *
 
-# Get all skat users
+from src.blueprints.skat_users_blueprint import skat_users_blueprint
 
-
-@app.route('/api/skat/skat-users', methods=['GET'])
-def get_all_skat_users():
-    all_skat_users = SkatUsers.query.all()
-    result = skat_users_schema.dump(all_skat_users)
-    return jsonify(result)
+app.register_blueprint(skat_users_blueprint)
 
 
-# Get single skat user
-@app.route('/api/skat/skat-users/<id>', methods=['GET'])
-def get_single_skat_user(id):
-    skat_user = SkatUsers.query.get(id)
-    if skat_user is None:
-        return Response(response=json.dumps(
-            {"message": "Skat User with id {} does not exist!".format(id)}),
-            status=404, mimetype="application/json")
-    return skat_user_schema.jsonify(skat_user), 200
-
-
-# Delete a skat user
-@app.route('/api/skat/skat-users/<id>', methods=['DELETE'])
-def delete_skat_user(id):
-    skat_user = SkatUsers.query.get(id)
-    if skat_user is None:
-        return Response(response=json.dumps(
-            {"message": "Skat User with id {} does not exist!".format(id)}),
-            status=404, mimetype="application/json")
-
-    # Delete user from skat user year table
-    SkatUsersYears.query.filter_by(skat_user_id=skat_user.id).delete()
-
-    db.session.delete(skat_user)
-    db.session.commit()
-    return skat_user_schema.jsonify(skat_user), 200
-
-
-# Create skat user
-@app.route('/api/skat/skat-users', methods=['POST'])
-def create_skat_user():
-    user_id = request.json['userId']
-    created_at = request.json['createdAt']
-    is_active = request.json['isActive']
-    new_skat_user = SkatUsers(user_id, created_at, is_active)
-    db.session.add(new_skat_user)
-    db.session.commit()
-    return skat_user_schema.jsonify(new_skat_user), 201
-
-
-# Update skat user
-@app.route('/api/skat/skat-users/<id>', methods=['PUT'])
-def update_skat_user(id):
-    user_id = request.json['userId']
-    created_at = request.json['createdAt']
-    is_active = request.json['isActive']
-
-    skat_user = SkatUsers.query.get(id)
-
-    if skat_user is None:
-        return Response(response=json.dumps(
-            {"message": "Skat user with id {} does not exist!".format(id)}),
-            status=404, mimetype="application/json")
-
-    if user_id:
-        skat_user.user_id = user_id
-    if created_at:
-        skat_user.created_at = datetime.strptime(
-            created_at, "%Y-%m-%dT%H:%M:%S")
-    if is_active is not None:
-        skat_user.is_active = is_active
-
-    db.session.commit()
-    return skat_user_schema.jsonify(skat_user), 200
 
 # ----------------
 # Skat Years
