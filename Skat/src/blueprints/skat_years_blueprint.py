@@ -1,5 +1,6 @@
 import json
 from flask import request, jsonify, Response, Blueprint
+import sqlalchemy 
 from datetime import datetime
 
 skat_years_blueprint = Blueprint('skat_years_blueprint', __name__)
@@ -40,20 +41,31 @@ def create_skat_year():
     new_skat_year = src.models.SkatYears(
         label, created_at, modified_at, start_date, end_date, is_active)
 
+    try:
+        db.session.add(new_skat_year)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        db.session.rollback()
+        return Response(response=json.dumps(
+                    {"message": "Integrity Error: {}".format(e)}), 
+                    status=400, 
+                    content_type={"Content-Type": "application/json"})
+    except:
+        db.session.rollback()
+        return "Something went wrong while creating a new skat year", 500
+
     # Get all skat users and insert into skat users years
     all_skat_users = src.models.SkatUsers.query.all()
     for skat_user in all_skat_users:
         new_skat_user_year = src.models.SkatUsersYears(
-            skat_user.id, new_skat_year.id, skat_user.user_id, is_active, 0.0)
-        db.session.add(new_skat_user_year)
-
-    try:
-        db.session.add(new_skat_year)
-        db.session.commit()
-    except:
-        db.session.rollback()
-        return "Something went wrong while adding a new skat year", 500
-
+            skat_user.id, new_skat_year.id, skat_user.user_id, False, 0.0)
+        try:
+            db.session.add(new_skat_user_year)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return "Something went wrong while creating a new skat user year", 500
+          
     return src.models.skat_year_schema.jsonify(new_skat_year), 201
 
 
@@ -94,7 +106,7 @@ def update_skat_year(id):
         db.session.commit()
     except:
         db.session.rollback()
-        return "Could not commit update on {}".format(skat_year), 400
+        return "Could not commit update skat year to database.", 500
 
     return src.models.skat_year_schema.jsonify(skat_year), 200
 
@@ -113,7 +125,7 @@ def delete_skat_year(id):
         db.session.commit()
     except:
         db.session.rollback()
-        return "Could not delete skat year with id {}".format(id), 400
+        return "Could not delete skat year with id {}".format(id), 500
 
     return src.models.skat_year_schema.jsonify(skat_year), 200
 

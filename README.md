@@ -1,10 +1,8 @@
 # system-integration-mandatory-assignment-2
 
-Bank System
-=====
+## Bank Service
 
-Run services
------------
+### Run services
 
 Run bank services at once with all the sub-services
 * docker-compose up --build
@@ -15,7 +13,15 @@ Access services individually
 * Interest Rate Function --> http://localhost:8082/api/Interest_rate_function
 * Loan Algorythm Function--> http://localhost:8083/api/Loan_Algorythm_Function
 
-Service definition
+### Bank Service definition
 -----------
 
 After starting the service find API docs on **{host}:{port}/swagger/index.html**
+
+## Skat Service
+
+Documentation on how to run the service locally is available in the [README.md](Skat/README.md)
+
+### Endpoint Definitions
+
+

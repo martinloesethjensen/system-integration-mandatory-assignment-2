@@ -38,8 +38,13 @@ def delete_skat_user(id):
     # Delete user from skat user year table
     src.models.SkatUsersYears.query.filter_by(skat_user_id=skat_user.id).delete()
 
-    db.session.delete(skat_user)
-    db.session.commit()
+    try:
+        db.session.delete(skat_user)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Could not delete skat user with id: {}".format(id), 500
+    
     return src.models.skat_user_schema.jsonify(skat_user), 200
 
 

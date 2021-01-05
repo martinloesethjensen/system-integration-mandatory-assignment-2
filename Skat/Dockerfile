@@ -2,4 +2,5 @@ FROM python:latest
 WORKDIR /code
 COPY . .
 RUN pip install -r requirements.txt
-CMD [ "python", "main.py" ]
+EXPOSE 8086
+CMD [ "python", "app.py" ]
