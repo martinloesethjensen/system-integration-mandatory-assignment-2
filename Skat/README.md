@@ -1,12 +1,12 @@
 # Skat Service
 
-## Running Locally 
+## Running Locally
 
 First change python env to `skat-env`
 
 ```sh
-python3 -m venv skat-env
-``` 
+source skat-env/bin/activate
+```
 
 Then install dependencies from the `requirements.txt` file.
 

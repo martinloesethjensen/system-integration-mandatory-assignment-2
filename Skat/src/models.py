@@ -27,7 +27,7 @@ class SkatUsersSchema(Schema):
 
 
 class SkatYears(db.Model):
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
     label = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP(timezone=False),
                         nullable=False, default=datetime.now())
@@ -57,7 +57,7 @@ class SkatYearsSchema(Schema):
 
 
 class SkatUsersYears(db.Model):
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
     skat_user_id = Column(Integer, ForeignKey('skat_users.id'), nullable=False)
     skat_year_id = Column(Integer, ForeignKey('skat_years.id'), nullable=False)
     user_id = Column(String(200), nullable=False,)

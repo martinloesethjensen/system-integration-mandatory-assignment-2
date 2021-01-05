@@ -1,4 +1,3 @@
-import requests 
 import json
 from flask import request, jsonify, Response, Blueprint
 from datetime import datetime
@@ -36,6 +35,8 @@ def create_skat_year():
     end_date = request.json['endDate']
     is_active = request.json['isActive']
 
+    # TODO check for null 
+
     new_skat_year = src.models.SkatYears(
         label, created_at, modified_at, start_date, end_date, is_active)
 
@@ -43,11 +44,16 @@ def create_skat_year():
     all_skat_users = src.models.SkatUsers.query.all()
     for skat_user in all_skat_users:
         new_skat_user_year = src.models.SkatUsersYears(
-            skat_user.id, new_skat_year.id, skat_user.user_id, False, 0.0)
+            skat_user.id, new_skat_year.id, skat_user.user_id, is_active, 0.0)
         db.session.add(new_skat_user_year)
 
-    db.session.add(new_skat_year)
-    db.session.commit()
+    try:
+        db.session.add(new_skat_year)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Something went wrong while adding a new skat year", 500
+
     return src.models.skat_year_schema.jsonify(new_skat_year), 201
 
 
@@ -84,7 +90,12 @@ def update_skat_year(id):
     if is_active is not None:
         skat_year.is_active = is_active
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Could not commit update on {}".format(skat_year), 400
+
     return src.models.skat_year_schema.jsonify(skat_year), 200
 
 
@@ -97,7 +108,12 @@ def delete_skat_year(id):
             {"message": "Skat Year with id {} does not exist!".format(id)}),
             status=404, mimetype="application/json")
 
-    db.session.delete(skat_year)
-    db.session.commit()
+    try:
+        db.session.delete(skat_year)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Could not delete skat year with id {}".format(id), 400
+
     return src.models.skat_year_schema.jsonify(skat_year), 200
 
