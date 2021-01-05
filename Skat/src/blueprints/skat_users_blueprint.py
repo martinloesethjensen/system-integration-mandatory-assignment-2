@@ -1,10 +1,8 @@
-import requests 
 import json
 from flask import request, jsonify, Response, Blueprint
 from datetime import datetime
 
 skat_users_blueprint = Blueprint('skat_users_blueprint', __name__)
-
 
 import src.models
 from app import db
