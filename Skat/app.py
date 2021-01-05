@@ -17,9 +17,11 @@ db = SQLAlchemy(app)
 from src.models import *
 
 from src.blueprints.skat_users_blueprint import skat_users_blueprint
+from src.blueprints.skat_users_years_blueprint import skat_users_years_blueprint
 from src.blueprints.tax_blueprint import tax_blueprint
 
 app.register_blueprint(skat_users_blueprint)
+app.register_blueprint(skat_users_years_blueprint)
 app.register_blueprint(tax_blueprint)
 
 
@@ -124,17 +126,6 @@ def delete_skat_year(id):
     db.session.commit()
     return skat_year_schema.jsonify(skat_year), 200
 
-
-# ----------------
-# Skat Users Years
-# ----------------
-
-# Get all skat users years
-@app.route('/api/skat/skat-users-years', methods=['GET'])
-def get_all_skat_users_years():
-    all_skat_users_years = SkatUsersYears.query.all()
-    result = skat_users_years_schema.dump(all_skat_users_years)
-    return jsonify(result), 200
 
 if __name__ == '__main__':
     app.run(port=5006, host='0.0.0.0', debug=True)
