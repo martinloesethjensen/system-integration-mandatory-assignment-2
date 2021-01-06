@@ -34,7 +34,7 @@ namespace BankSystem.Controllers
             using (var connection = _databaseContext.Connection)
             {
                 var data = await connection.QueryAsync("select * from Deposit where BankUserId = @BankUserId", new { BankUserId = bankUserId });
-                if (data == null) return NotFound();
+                if (data == null) return NotFound("There are no Deposit(s) created yet.");
                 return Ok(data);
             }
         }
@@ -54,12 +54,12 @@ namespace BankSystem.Controllers
             try
             {
                 double interestRateFuncResponse = 0;
-                HttpResponseMessage intrestFunctResp = await HTTP.PostRequest("http://interest_rate_func/api/Interest_rate_function", new { amount = bodyPayload.Amount }, CancellationToken.None ); // url is to be replaced
+                HttpResponseMessage intrestFunctResp = await HTTP.PostRequest("http://interest_rate_func/api/Interest_rate_function", new { amount = bodyPayload.Amount }, CancellationToken.None); // url is to be replaced
                 if (intrestFunctResp != null && intrestFunctResp.StatusCode == HttpStatusCode.OK)
                 {
                     var temp = await intrestFunctResp.Content.ReadAsStringAsync();
                     interestRateFuncResponse = Convert.ToDouble(temp.Replace(".", ","));
-                } 
+                }
                 if (interestRateFuncResponse == 0) return NotFound("Interest rate function may be offline. Try again later.");
                 DepositDto depositToInsert = new DepositDto(bodyPayload.BankUserId, TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds(), bodyPayload.Amount);
 
