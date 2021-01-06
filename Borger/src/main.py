@@ -6,6 +6,7 @@ from flask_marshmallow import Schema
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, DateTime
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///borger.db'
@@ -71,6 +72,9 @@ def add_borger():
     try:
         db.session.add(new_borger)
         db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return "userId: {} already exists".format(userId), 409
     except:
         db.session.rollback()
         return "Something went wrong while creating a new borger", 500
@@ -177,7 +181,7 @@ def get_all_addresses():
 def get_single_address(id):
     address = Address.query.get(id)
     if address is None:
-        return "Address with id {} does not exist!", 404
+        return "Address with id {} does not exist!".format(id), 404
     return address_schema.jsonify(address), 200
 
 
