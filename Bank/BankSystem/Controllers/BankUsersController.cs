@@ -3,6 +3,7 @@ using BankSystem.Interfaces;
 using BankSystem.Models;
 using BankSystem.Utils;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankSystem.Controllers
@@ -26,7 +27,7 @@ namespace BankSystem.Controllers
             {
                 var data = await connection.QueryAsync<BankUserDto>("select * from BankUser");
                 if (data != null) return Ok(data);
-                else return NotFound();
+                else return NotFound("There are no BankUser(s) created yet.");
             }
         }
 
@@ -36,9 +37,9 @@ namespace BankSystem.Controllers
         {
             using (var connection = _databaseContext.Connection)
             {
-                var data = await connection.QueryFirstOrDefaultAsync<BankUserDto>("select * from BankUser where Id = @Id", new { Id = id});
+                var data = await connection.QueryFirstOrDefaultAsync<BankUserDto>("select * from BankUser where Id = @Id", new { Id = id });
                 if (data != null) return Ok(data);
-                else return NotFound();
+                else return NotFound($"BankUser does not exist on id:{id}");
             }
         }
 
@@ -54,8 +55,8 @@ namespace BankSystem.Controllers
             using (var connection = _databaseContext.Connection)
             {
                 var result = await connection.ExecuteAsync(@"insert into BankUser (UserId, CreatedAt, ModifiedAt) values (@UserId, @CreatedAt, @ModifiedAt )", bodyInput);
-                if (result == 1) return Ok();
-                else return NotFound();
+                if (result == 1) return new ObjectResult("BankUser created.") { StatusCode = StatusCodes.Status204NoContent };
+                else return NotFound("BankUser could not be created.");
             }
         }
 
@@ -74,8 +75,8 @@ namespace BankSystem.Controllers
             using (var connection = _databaseContext.Connection)
             {
                 var result = await connection.ExecuteAsync(@"update BankUser set UserId = @UserId, ModifiedAt = @ModifiedAt where Id = @Id ", bodyPayload);
-                if (result == 1) return Ok();
-                else return NotFound();
+                if (result == 1) return new ObjectResult("BankUser updated.") { StatusCode = StatusCodes.Status204NoContent };
+                else return NotFound("BankUser not found or could not be updated.");
             }
         }
 
@@ -85,9 +86,9 @@ namespace BankSystem.Controllers
         {
             using (var connection = _databaseContext.Connection)
             {
-                var result = await connection.ExecuteAsync("delete from BankUser where Id = @Id", new{ Id = id });
-                if (result == 1) return Ok();
-                else return NotFound();
+                var result = await connection.ExecuteAsync("delete from BankUser where Id = @Id", new { Id = id });
+                if (result == 1) return new ObjectResult("BankUser deleted.") { StatusCode = StatusCodes.Status204NoContent };
+                else return NotFound($"BankUser doesn't exist on id:{id}.");
             }
         }
     }

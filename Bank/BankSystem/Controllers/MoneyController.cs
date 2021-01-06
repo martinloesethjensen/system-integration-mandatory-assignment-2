@@ -27,7 +27,7 @@ namespace BankSystem.Controllers
              * Subtract (if possible) the amount from that users account. Throw an error otherwise.
              */
 
-            if (bodyPayload.Amount <= 0) return Conflict("Amount cannot be 0 or negative.");
+            if (bodyPayload.Amount <= 0) return BadRequest("Amount cannot be 0 or negative.");
 
             using (var connection = _databaseContext.Connection)
             {
@@ -46,11 +46,11 @@ namespace BankSystem.Controllers
                                 Account WHERE BankUserId = @BankUserId 
                             IF @amount > 0  and @amount > @substract
                             UPDATE 
-                                Account SET Amount = @amount - @substract WHERE BankUserId = @BankUserId", new { BankUserId = result.UserId, substract = bodyPayload.Amount } , transaction
+                                Account SET Amount = @amount - @substract WHERE BankUserId = @BankUserId", new { BankUserId = result.UserId, substract = bodyPayload.Amount }, transaction
                         );
                         if (withdrawMoneyresult != 1) new Exception(); // Change to custom exception
                         transaction.Commit();
-                        return Ok();
+                        return Ok("Sucesful withdrawal");
                     }
                     catch (Exception ex)
                     {
