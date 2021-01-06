@@ -196,11 +196,7 @@ def update_address(id):
     isValid = request.json['isValid']
 
     address = Address.query.get(id)
-    # borger = db.session.query(Borger).filter(Borger.userId == borgerUserId)
     borger = Borger.query.filter_by(userId=borgerUserId).first()
-
-    print(borger)
-    print(borgerUserId)
 
     if borger is None:
         return "Address can't be updated with borger user id: {} that does not exist".format(borgerUserId), 404
