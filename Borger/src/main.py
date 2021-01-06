@@ -68,10 +68,14 @@ def add_borger():
 
     new_borger = Borger(userId)
 
-    db.session.add(new_borger)
-    db.session.commit()
+    try:
+        db.session.add(new_borger)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Something went wrong while creating a new borger", 500
 
-    return borger_schema.jsonify(new_borger)
+    return borger_schema.jsonify(new_borger), 201
 
 
 # Get all borgers
@@ -79,14 +83,16 @@ def add_borger():
 def get_all_borger():
     all_borgers = Borger.query.all()
     result = borgers_schema.dump(all_borgers)
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 # Get single borger
 @app.route('/api/borger/borger/<id>', methods=['GET'])
 def get_single_borger(id):
     borger = Borger.query.get(id)
-    return borger_schema.jsonify(borger)
+    if borger is None:
+        return "Borger with id: {} does not exist.".format(id), 404
+    return borger_schema.jsonify(borger), 200
 
 
 # Update borger
@@ -97,22 +103,39 @@ def update_borger(id):
     userId = request.json['userId']
     createdAt = request.json['createdAt']
 
-    borger.userId = userId
-    borger.createdAt = createdAt
+    if borger is None:
+        return "Borger with id: {} does not exist".format(id), 404
 
-    db.session.commit()
+    if userId:
+        borger.userId = userId
 
-    return borger_schema.jsonify(borger)
+    if createdAt:
+        borger.createdAt = createdAt
+
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Something went wrong while updating the borger with id: {}".format(id), 500
+
+    return borger_schema.jsonify(borger), 200
 
 
 # Delete single borger
 @app.route('/api/borger/borger/<id>', methods=['DELETE'])
 def delete_single_borger(id):
     borger = Borger.query.get(id)
-    db.session.delete(borger)
-    db.session.commit()
 
-    return borger_schema.jsonify(borger)
+    if borger is None:
+        return "Borger with id: {} does not exist.".format(id), 404
+
+    try:
+        db.session.delete(borger)
+        db.session.commit()
+    except:
+        return "Something went wrong while trying to delete the borger with id: {}.".format(id), 500
+
+    return borger_schema.jsonify(borger), 200
 
 
 # Create address
@@ -131,10 +154,14 @@ def add_address():
 
     new_address = Address(borgerUserId, address, isValid)
 
-    db.session.add(new_address)
-    db.session.commit()
+    try:
+        db.session.add(new_address)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Something went wrong while creating the address", 500
 
-    return borger_schema.jsonify(new_address)
+    return borger_schema.jsonify(new_address), 201
 
 
 # Get all addresses
@@ -142,42 +169,64 @@ def add_address():
 def get_all_addresses():
     all_addresses = Address.query.all()
     result = addresses_schema.dump(all_addresses)
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 # Get single address
 @app.route('/api/borger/address/<id>', methods=['GET'])
 def get_single_address(id):
     address = Address.query.get(id)
-    return address_schema.jsonify(address)
+    if address is None:
+        return "Address with id {} does not exist!", 404
+    return address_schema.jsonify(address), 200
 
 
 # Update address
 @app.route('/api/borger/address/<id>', methods=['PUT'])
 def update_address(id):
-    address = Address.query.get(id)
-
     borgerUserId = request.json['borgerUserId']
     addressField = request.json['address']
     isValid = request.json['isValid']
 
-    address.borgerUserId = borgerUserId
-    address.address = addressField
-    address.isValid = isValid
+    address = Address.query.get(id)
 
-    db.session.commit()
+    if address is None:
+        return "Address with id: {} does not exist.", 404
 
-    return address_schema.jsonify(address)
+    if borgerUserId:
+        address.borgerUserId = borgerUserId
+    
+    if addressField:
+        address.address = addressField
+
+    if isValid:
+        address.isValid = isValid
+
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Something went wrong while updating the address with id: {}".format(id), 500
+
+    return address_schema.jsonify(address), 200
 
 
 # Delete single address
 @app.route('/api/borger/address/<id>', methods=['DELETE'])
 def delete_single_address(id):
     address = Address.query.get(id)
-    db.session.delete(address)
-    db.session.commit()
 
-    return address_schema.jsonify(address)
+    if address is None:
+        return "Address with id: {} does not exist", 404
+    
+    try:
+        db.session.delete(address)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return "Something went wrong while deleting the address with id: {}".format(id), 500
+    
+    return address_schema.jsonify(address), 200
 
 
 if __name__ == '__main__':
