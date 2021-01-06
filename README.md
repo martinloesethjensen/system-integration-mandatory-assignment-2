@@ -2,7 +2,7 @@
 
 [![Run in Insomnia}](https://insomnia.rest/images/run.svg)](https://insomnia.rest/run/?label=SI%20Mandatory%202%20API&uri=https%3A%2F%2Fmartinloesethjensen.github.io%2Fsystem-integration-mandatory-assignment-2%2Fdocs%2Finsomnia-doc%2Finsomnia.json)
 
-[![Check Insomnia Documentation](https://insomnia.rest/images/run.svg)](docs)
+[[Check Insomnia Documentation]](docs)
 
 ## Bank Service
 
