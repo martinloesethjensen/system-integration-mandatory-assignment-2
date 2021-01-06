@@ -1,5 +1,7 @@
 # system-integration-mandatory-assignment-2
 
+API file: [insomnia.json](insomnia.json)
+
 ## Bank Service
 
 ### Run services
@@ -24,4 +26,4 @@ Documentation on how to run the service locally is available in the [README.md](
 
 ### Endpoint Definitions
 
-
+API file: [insomnia.json](insomnia.json)
