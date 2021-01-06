@@ -24,10 +24,3 @@ Then install dependencies from the `requirements.txt` file.
 ```sh
 pip3 install -r requirements.txt
 ```
-
-## Running with Docker
-
-```sh
-docker build -t skat-service .
-docker 
-```
