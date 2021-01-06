@@ -36,8 +36,6 @@ def create_skat_year():
     end_date = request.json['endDate']
     is_active = request.json['isActive']
 
-    # TODO check for null 
-
     new_skat_year = src.models.SkatYears(
         label, created_at, modified_at, start_date, end_date, is_active)
 

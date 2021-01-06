@@ -118,6 +118,9 @@ def update_borger(id):
 
     try:
         db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return "userId: {} already exists".format(userId), 409
     except:
         db.session.rollback()
         return "Something went wrong while updating the borger with id: {}".format(id), 500
@@ -193,9 +196,17 @@ def update_address(id):
     isValid = request.json['isValid']
 
     address = Address.query.get(id)
+    # borger = db.session.query(Borger).filter(Borger.userId == borgerUserId)
+    borger = Borger.query.filter_by(userId=borgerUserId).first()
+
+    print(borger)
+    print(borgerUserId)
+
+    if borger is None:
+        return "Address can't be updated with borger user id: {} that does not exist".format(borgerUserId), 404
 
     if address is None:
-        return "Address with id: {} does not exist.", 404
+        return "Address with id: {} does not exist.".format(id), 404
 
     if borgerUserId:
         address.borgerUserId = borgerUserId
@@ -221,7 +232,7 @@ def delete_single_address(id):
     address = Address.query.get(id)
 
     if address is None:
-        return "Address with id: {} does not exist", 404
+        return "Address with id: {} does not exist".format(id), 404
     
     try:
         db.session.delete(address)

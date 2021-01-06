@@ -12,7 +12,7 @@ from app import db
 def get_all_skat_users():
     all_skat_users = src.models.SkatUsers.query.all()
     result = src.models.skat_users_schema.dump(all_skat_users)
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 # Get single skat user
