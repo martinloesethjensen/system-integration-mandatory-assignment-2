@@ -1,7 +1,5 @@
 # system-integration-mandatory-assignment-2
 
-API file: [insomnia.json](insomnia.json)
-
 ## Bank Service
 
 ### Run services
