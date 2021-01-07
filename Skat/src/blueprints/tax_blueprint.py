@@ -56,6 +56,7 @@ def pay_taxes():
                     db.session.commit()
                 except:
                     db.session.rollback()
+                    return "Something went wrong with updating the skat user year to the database.", 500
                     
                 return Response(response=json.dumps(
                     {"message": "Succeeded in sending request to the bank api"}),
