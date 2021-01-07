@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BankSystem.Interfaces;
 using BankSystem.Models;
 using BankSystem.Utils;
@@ -47,17 +48,24 @@ namespace BankSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAccount([FromBody] AccountDto bodyPayload)
         {
-            long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
-
-            bodyPayload.CreatedAt = timeStamp;
-            bodyPayload.ModifiedAt = timeStamp;
-
-            using (var connection = _databaseContext.Connection)
+            try
             {
-                var result = await connection.ExecuteAsync("insert into Account (BankUserId,AccountNo,IsStudent,CreatedAt,ModifiedAt,Amount)" +
-                                                           "values (@BankUserId,@AccountNo,@IsStudent,@CreatedAt,@ModifiedAt,@Amount)", bodyPayload);
-                if (result != 1) return NotFound("Account could not be created.");
-                return new ObjectResult("Account created.") { StatusCode = StatusCodes.Status204NoContent };
+                long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
+
+                bodyPayload.CreatedAt = timeStamp;
+                bodyPayload.ModifiedAt = timeStamp;
+
+                using (var connection = _databaseContext.Connection)
+                {
+                    var result = await connection.ExecuteAsync("insert into Account (BankUserId,AccountNo,IsStudent,CreatedAt,ModifiedAt,Amount)" +
+                                                            "values (@BankUserId,@AccountNo,@IsStudent,@CreatedAt,@ModifiedAt,@Amount)", bodyPayload);
+                    if (result != 1) return NotFound("Account could not be created.");
+                    return new ObjectResult("Account created.") { StatusCode = StatusCodes.Status204NoContent };
+                }
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.ToString());
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BankSystem.Interfaces;
 using BankSystem.Models;
 using BankSystem.Utils;
@@ -47,16 +48,23 @@ namespace BankSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBankUser([FromBody] BankUserDto bodyInput)
         {
-            long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
-
-            bodyInput.CreatedAt = timeStamp;
-            bodyInput.ModifiedAt = timeStamp;
-
-            using (var connection = _databaseContext.Connection)
+            try
             {
-                var result = await connection.ExecuteAsync(@"insert into BankUser (UserId, CreatedAt, ModifiedAt) values (@UserId, @CreatedAt, @ModifiedAt )", bodyInput);
-                if (result == 1) return new ObjectResult("BankUser created.") { StatusCode = StatusCodes.Status204NoContent };
-                else return NotFound("BankUser could not be created.");
+                long timeStamp = TimeStamp.GetDateTimeOffsetNowAsUnixTimeStampInSeconds();
+
+                bodyInput.CreatedAt = timeStamp;
+                bodyInput.ModifiedAt = timeStamp;
+
+                using (var connection = _databaseContext.Connection)
+                {
+                    var result = await connection.ExecuteAsync(@"insert into BankUser (UserId, CreatedAt, ModifiedAt) values (@UserId, @CreatedAt, @ModifiedAt )", bodyInput);
+                    if (result == 1) return new ObjectResult("BankUser created.") { StatusCode = StatusCodes.Status204NoContent };
+                    else return NotFound("BankUser could not be created.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.ToString());
             }
         }
 
