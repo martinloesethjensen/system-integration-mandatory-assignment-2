@@ -10,9 +10,12 @@ GO
 
 CREATE TABLE [dbo].[BankUser] (
     [Id]         INT    IDENTITY (1, 1) NOT NULL,
-    [UserId]     INT    NOT NULL,
+    [UserId]     INT    NOT NULL UNIQUE,
     [CreatedAt]  BIGINT NOT NULL,
-    [ModifiedAt] BIGINT NOT NULL
+    [ModifiedAt] BIGINT NOT NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    UNIQUE NONCLUSTERED ([UserId] ASC)
 );
+
 
 

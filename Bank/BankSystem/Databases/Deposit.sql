@@ -12,8 +12,11 @@ CREATE TABLE [dbo].[Deposit] (
     [Id]         INT        IDENTITY (1, 1) NOT NULL,
     [BankUserId] INT        NOT NULL,
     [CreatedAt]  BIGINT     NOT NULL,
-    [Amount]     FLOAT (53) NOT NULL
+    [Amount]     FLOAT (53) NOT NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    FOREIGN KEY ([BankUserId]) REFERENCES [dbo].[BankUser] ([UserId]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 
 
 

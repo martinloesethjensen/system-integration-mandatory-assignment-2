@@ -15,7 +15,11 @@ CREATE TABLE [dbo].[Account] (
     [IsStudent]  BIT        NOT NULL,
     [CreatedAt]  BIGINT     NOT NULL,
     [ModifiedAt] BIGINT     NOT NULL,
-    [Amount]     FLOAT (53) NOT NULL
+    [Amount]     FLOAT (53) NOT NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    UNIQUE NONCLUSTERED ([BankUserId] ASC),
+    UNIQUE NONCLUSTERED ([AccountNo] ASC),
+    FOREIGN KEY ([BankUserId]) REFERENCES [dbo].[BankUser] ([UserId]) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
