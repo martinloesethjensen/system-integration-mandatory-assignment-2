@@ -24,7 +24,7 @@
           "Port": "5004"
         }
       ],
-      "UpstreamPathTemplate": "/api/borger/borger{id}",
+      "UpstreamPathTemplate": "/api/borger/borger/{id}",
       "UpstreamHttpMethod": [
         "GET",
         "DELETE",
