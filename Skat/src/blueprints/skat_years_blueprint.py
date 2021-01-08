@@ -46,7 +46,7 @@ def create_skat_year():
         db.session.rollback()
         return Response(response=json.dumps(
                     {"message": "Integrity Error: {}".format(e)}), 
-                    status=400, 
+                    status=409, 
                     content_type={"Content-Type": "application/json"})
     except:
         db.session.rollback()
